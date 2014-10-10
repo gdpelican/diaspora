@@ -1,6 +1,8 @@
 app.Router = Backbone.Router.extend({
   routes: {
     "help": "help",
+    "contacts": "contacts",
+    "conversations": "conversations",
 
     //new hotness
     "posts/:id": "singlePost",
@@ -19,11 +21,12 @@ app.Router = Backbone.Router.extend({
     "followed_tags": "followed_tags",
     "tags/:name": "followed_tags",
     "people/:id/photos": "photos",
+    "people/:id/contacts": "profile",
 
-    "people/:id": "stream",
-    "u/:name": "stream"
+    "people/:id": "profile",
+    "u/:name": "profile"
   },
-  
+
   initialize: function() {
     // To support encoded linefeeds (%0A) we need to specify
     // our own internal router.route call with the correct regexp.
@@ -37,14 +40,27 @@ app.Router = Backbone.Router.extend({
     app.help.render();
   },
 
+  contacts: function() {
+    app.contacts = new app.views.Contacts();
+  },
+
+  conversations: function() {
+    app.conversations = new app.views.Conversations();
+  },
+
   singlePost : function(id) {
     this.renderPage(function(){ return new app.pages.SinglePostViewer({ id: id })});
   },
 
   renderPage : function(pageConstructor){
-    app.page && app.page.unbind && app.page.unbind() //old page might mutate global events $(document).keypress, so unbind before creating
-    app.page = pageConstructor() //create new page after the world is clean (like that will ever happen)
-    $("#container").html(app.page.render().el)
+    app.page && app.page.unbind && app.page.unbind(); //old page might mutate global events $(document).keypress, so unbind before creating
+    app.page = pageConstructor(); //create new page after the world is clean (like that will ever happen)
+    app.page.render();
+
+    if( !$.contains(document, app.page.el) ) {
+      // view element isn't already attached to the DOM, insert it
+      $("#container").empty().append(app.page.el);
+    }
   },
 
   //below here is oldness
@@ -59,13 +75,18 @@ app.Router = Backbone.Router.extend({
 
     $("#main_stream").html(app.page.render().el);
     $('#selected_aspect_contacts .content').html(streamFacesView.render().el);
-    this.hideInactiveStreamLists();
+    this._hideInactiveStreamLists();
   },
 
-  photos : function() {
-    app.photos = new app.models.Stream([], {collection: app.collections.Photos});
-    app.page = new app.views.Photos({model : app.photos});
-    $("#main_stream").html(app.page.render().el);
+  photos : function(guid) {
+    this.renderPage(function() {
+      return new app.pages.Profile({
+        person_id: guid,
+        el: $('body > .container-fluid'),
+        streamCollection: app.collections.Photos,
+        streamView: app.views.Photos
+      });
+    });
   },
 
   followed_tags : function(name) {
@@ -84,7 +105,7 @@ app.Router = Backbone.Router.extend({
           );
       $("#author_info").prepend(followedTagsAction.render().el)
     }
-    this.hideInactiveStreamLists();
+    this._hideInactiveStreamLists();
   },
 
   aspects : function(){
@@ -107,10 +128,10 @@ app.Router = Backbone.Router.extend({
 
     $("#main_stream").html(app.page.render().el);
     $('#selected_aspect_contacts .content').html(streamFacesView.render().el);
-    this.hideInactiveStreamLists();
+    this._hideInactiveStreamLists();
   },
 
-  hideInactiveStreamLists: function() {
+  _hideInactiveStreamLists: function() {
     if(this.aspects_list && Backbone.history.fragment != "aspects")
       this.aspects_list.hideAspectsList();
 
@@ -123,6 +144,12 @@ app.Router = Backbone.Router.extend({
     app.bookmarklet = new app.views.Bookmarklet(
       _.extend({}, {el: $('#bookmarklet')}, contents)
     ).render();
+  },
+
+  profile: function() {
+    this.renderPage(function() { return new app.pages.Profile({
+      el: $('body > .container-fluid')
+    }); });
   }
 });
 

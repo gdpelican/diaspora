@@ -4,7 +4,7 @@
 
 defaults:
   version:
-    number: "0.4.1.1" # Do not touch unless doing a release, do not backport the version number that's in master but keep develop to always say "head"
+    number: "head" # Do not touch unless doing a release, do not backport the version number that's in master but keep develop to always say "head"
   heroku: false
   environment:
     url: "http://localhost:3000/"
@@ -41,7 +41,7 @@ defaults:
     embed_sidekiq_worker: false
     sidekiq_workers: 1
   privacy:
-    jquery_cdn: true
+    jquery_cdn: false
     google_analytics_key:
     piwik:
       enable: false

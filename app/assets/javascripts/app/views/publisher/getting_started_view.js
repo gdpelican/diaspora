@@ -21,21 +21,24 @@ app.views.PublisherGettingStarted = Backbone.View.extend({
       offset: 30,
       id: 'first_message_explain',
       placement: 'right',
-      html: true
+      html: true,
+      container: 'body'
     }, 600);
     this._addPopover(this.el_visibility, {
       trigger: 'manual',
       offset: 10,
       id: 'message_visibility_explain',
       placement: 'bottom',
-      html: true
+      html: true,
+      container: 'body'
     }, 1000);
     this._addPopover(this.el_stream, {
       trigger: 'manual',
       offset: -5,
       id: 'stream_explain',
       placement: 'left',
-      html: true
+      html: true,
+      container: 'body'
     }, 1400);
 
     // hide some popovers when a post is created
@@ -61,7 +64,9 @@ app.views.PublisherGettingStarted = Backbone.View.extend({
 
       close.click(function() {
         if( $('.popover').length==1 ) {
-          $.get('/getting_started_completed');
+          $.get('/getting_started_completed', {success: function() {
+            $("#welcome-to-diaspora, #welcome-to-diaspora~br").remove();
+          }});
         }
         el.popover('hide');
         return false;

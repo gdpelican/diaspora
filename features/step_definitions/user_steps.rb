@@ -119,10 +119,7 @@ Then /^I should have (\d) contacts? in "([^"]*)"$/ do |n_contacts, aspect_name|
 end
 
 When /^I (?:add|remove) the person (?:to|from) my "([^\"]*)" aspect$/ do |aspect_name|
-    aspects_dropdown = find(".aspect_membership .toggle.button", match: :first)
-    aspects_dropdown.click
-    find(".dropdown.active .dropdown_list li", text: aspect_name).click
-    aspects_dropdown.click
+  toggle_aspect_via_ui(aspect_name)
 end
 
 When /^I post a status with the text "([^\"]*)"$/ do |text|
@@ -201,7 +198,7 @@ end
 
 Given /^I visit alice's invitation code url$/ do
   @alice ||= FactoryGirl.create(:user, :username => 'alice', :getting_started => false)
-  invite_code  = InvitationCode.find_or_create_by_user_id(@alice.id)
+  invite_code  = InvitationCode.find_or_create_by(user_id: @alice.id)
   visit invite_code_path(invite_code)
 end
 

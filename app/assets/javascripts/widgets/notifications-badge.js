@@ -50,10 +50,11 @@
     this.hideDropdown = function() {
       self.badge.removeClass("active");
       self.dropdown.css("display", "none");
+      $('.notifications').perfectScrollbar('destroy');
     };
 
     this.getNotifications = function() {
-      $.getJSON("/notifications?per_page=5", function(notifications) {
+      $.getJSON("/notifications?per_page=15", function(notifications) {
         self.notifications = notifications;
         self.renderNotifications();
       });
@@ -75,6 +76,8 @@
       self.dropdownNotifications.find('.read').each(function(index) {
         Diaspora.page.header.notifications.setUpRead( $(this) );
       });
+      $('.notifications').perfectScrollbar();
+      $(".notifications").scrollTop(0);
       self.ajaxLoader.hide();
     };
   };

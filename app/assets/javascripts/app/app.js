@@ -12,6 +12,8 @@
 //= require_tree ./collections
 //= require_tree ./views
 
+//= require perfect-scrollbar
+
 var app = {
   collections: {},
   models: {},
@@ -33,11 +35,6 @@ var app = {
   user: function(userAttrs) {
     if(userAttrs) { return this._user = new app.models.User(userAttrs) }
     return this._user || false
-  },
-
-  baseImageUrl: function(baseUrl){
-    if(baseUrl) { return this._baseImageUrl = baseUrl }
-    return this._baseImageUrl || "assets/"
   },
 
   initialize: function() {
@@ -89,8 +86,8 @@ var app = {
   },
 
   setupFacebox: function() {
-    $.facebox.settings.closeImage = app.baseImageUrl()+'facebox/closelabel.png';
-    $.facebox.settings.loadingImage = app.baseImageUrl()+'facebox/loading.gif';
+    $.facebox.settings.closeImage = ImagePaths.get('facebox/closelabel.png');
+    $.facebox.settings.loadingImage = ImagePaths.get('facebox/loading.gif');
     $.facebox.settings.opacity = 0.75;
   },
 

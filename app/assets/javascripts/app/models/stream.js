@@ -2,7 +2,11 @@
 //= require ../collections/photos
 app.models.Stream = Backbone.Collection.extend({
   initialize : function(models, options){
-    var collectionClass = options && options.collection || app.collections.Posts;
+    var collectionClass = app.collections.Posts
+    if( options ) {
+      options.collection && (collectionClass = options.collection);
+      options.basePath && (this.streamPath = options.basePath);
+    }
     this.items = new collectionClass([], this.collectionOptions());
   },
 
@@ -19,13 +23,12 @@ app.models.Stream = Backbone.Collection.extend({
     var defaultOpts = {
       remove: false  // tell backbone to keep existing items in the collection
     };
-    return _.extend({}, defaultOpts, opts);
+    return _.extend({ url: this.url() }, defaultOpts, opts);
   },
 
   fetch: function() {
     if( this.isFetching() ) return false;
-    var url = this.url();
-    this.deferred = this.items.fetch(this._fetchOpts({url : url}))
+    this.deferred = this.items.fetch( this._fetchOpts() )
       .done(_.bind(this.triggerFetchedEvents, this));
   },
 
@@ -43,7 +46,7 @@ app.models.Stream = Backbone.Collection.extend({
   },
 
   basePath : function(){
-    return document.location.pathname;
+    return this.streamPath || document.location.pathname;
   },
 
   timeFilteredPath : function(){

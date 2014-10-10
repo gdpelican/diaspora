@@ -74,7 +74,7 @@ end
 
 And /^I want to mention (?:him|her) from the profile$/ do
   find('#mention_button').click
-  within('#facebox') do
+  within('#mentionModal') do
     click_publisher
   end
 end
@@ -130,6 +130,12 @@ When /^(.*) in the modal window$/ do |action|
   end
 end
 
+When /^(.*) in the mention modal$/ do |action|
+  within('#mentionModal') do
+    step action
+  end
+end
+
 When /^I press the first "([^"]*)"(?: within "([^"]*)")?$/ do |link_selector, within_selector|
   with_scope(within_selector) do
     current_scope.find(link_selector, match: :first).click
@@ -150,12 +156,12 @@ end
 
 Then /^(?:|I )should not see a "([^\"]*)"(?: within "([^\"]*)")?$/ do |selector, scope_selector|
   with_scope(scope_selector) do
-    current_scope.has_css?(selector, :visible => true).should be_false
+    current_scope.has_css?(selector, :visible => true).should be false
   end
 end
 
 Then /^page should (not )?have "([^\"]*)"$/ do |negate, selector|
-  page.has_css?(selector).should ( negate ? be_false : be_true )
+  page.has_css?(selector).should ( negate ? (be false) : (be true) )
 end
 
 When /^I have turned off jQuery effects$/ do
@@ -165,7 +171,7 @@ end
 When /^I search for "([^\"]*)"$/ do |search_term|
   fill_in "q", :with => search_term
   find_field("q").native.send_key(:enter)
-  find("#leftNavBar")
+  find("#tags_show .span3")
 end
 
 Then /^the "([^"]*)" field(?: within "([^"]*)")? should be filled with "([^"]*)"$/ do |field, selector, value|
@@ -178,7 +184,7 @@ Then /^the "([^"]*)" field(?: within "([^"]*)")? should be filled with "([^"]*)"
 end
 
 Then /^I should see (\d+) contacts$/ do |n_posts|
-  has_css?("#people_stream .stream_element", :count => n_posts.to_i).should be_true
+  has_css?("#people_stream .stream_element", :count => n_posts.to_i).should be true
 end
 
 And /^I scroll down$/ do
@@ -217,15 +223,15 @@ And /^I click close on all the popovers$/ do
 end
 
 Then /^I should see a flash message indicating success$/ do
-  flash_message_success?.should be_true
+  flash_message_success?.should be true
 end
 
 Then /^I should see a flash message indicating failure$/ do
-  flash_message_failure?.should be_true
+  flash_message_failure?.should be true
 end
 
 Then /^I should see a flash message with a warning$/ do
-  flash_message_alert?.should be_true
+  flash_message_alert?.should be true
 end
 
 Then /^I should see a flash message containing "(.+)"$/ do |text|

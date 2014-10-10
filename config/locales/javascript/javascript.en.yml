@@ -17,9 +17,11 @@ en:
         exists: "The report already exists"
     ignore_user: "Ignore this user?"
     ignore_failed: "Unable to ignore this user"
+    unblock_failed: "Unblocking this user has failed"
     and: "and"
     comma: ","
     edit: "Edit"
+    no_results: "No Results Found"
     timeago:
       prefixAgo: ""
       prefixFromNow: ""
@@ -37,6 +39,14 @@ en:
       year: "about a year"
       years: "%d years"
       wordSeparator: " "
+
+    contacts:
+      add_contact: "Add contact"
+      aspect_list_is_visible: "Contacts in this aspect are able to see each other."
+      aspect_list_is_not_visible: "Contacts in this aspect are not able to see each other."
+      remove_contact: "Remove contact"
+      error_add: "Couldn't add <%= name %> to the aspect :("
+      error_remove: "Couldn't remove <%= name %> from the aspect :("
 
     my_activity: "My Activity"
     my_stream: "Stream"
@@ -106,6 +116,25 @@ en:
       wasnt_that_interesting: "OK, I suppose #<%= tagName %> wasn't all that interesting..."
     people:
       not_found: "and no one was found..."
+      mention: "Mention"
+      message: "Message"
+      edit_my_profile: "Edit my profile"
+      stop_ignoring: "Stop ignoring"
+      helper:
+        is_sharing: "<%= name %> is sharing with you"
+        is_not_sharing: "<%= name %> is not sharing with you"
+    profile:
+      edit: "edit"
+      add_some: "add some"
+      you_have_no_tags: "you have no tags!"
+      ignoring: "You are ignoring all posts from <%= name %>."
+      bio: "Bio"
+      location: "Location"
+      gender: "Gender"
+      born: "Birthday"
+      photos: "Photos"
+      contacts: "Contacts"
+      posts: "Posts"
 
     conversation:
       participants: "Participants"

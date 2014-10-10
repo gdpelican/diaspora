@@ -1,3 +1,67 @@
+# Head
+
+## Major Sidekiq update
+This release includes a major upgrade of the background processing system Sidekiq. To upgrade cleanly:
+
+1. Stop diaspora*
+2. Run `RAILS_ENV=production bundle exec sidekiq` and wait 5-10 minutes, then stop it again (hit `CTRL+C`)
+3. Do a normal upgrade of diaspora*
+4. Start diaspora*
+
+## Rails 4 - Manual action required
+Please edit `config/initializers/secret_token.rb`, replacing `secret_token` with
+`secret_key_base`.
+
+```ruby
+# Old
+Rails.application.config.secret_token = '***********...'
+
+# New
+Diaspora::Application.config.secret_key_base = '*************...'
+```
+
+You also need to take care to set `RAILS_ENV` and to clear the cache while precompiling assets: `RAILS_ENV=production bundle exec rake tmp:cache:clear assets:precompile`
+
+## Supported Ruby versions
+This release drops official support for the Ruby 1.9 series. This means we will no longer test against this Ruby version or take care to choose libraries
+that work with it. However that doesn't mean we won't accept patches that improve running diaspora* on it.
+
+At the same time we adopt support for the Ruby 2.1 series and recommend running on the latest Ruby version of that branch. We continue to support the Ruby 2.0
+series and run our comphrensive testsuite against it.
+
+## Change in defaults.yml
+The default for including jQuery from a CDN has changed. If you want to continue to include it from a CDN, please explicitly set the `jquery_cdn` setting to `true` in diaspora.yml.
+
+## Refactor
+* Redesign contacts page [#5153](https://github.com/diaspora/diaspora/pull/5153)
+* Improve profile page design on mobile [#5084](https://github.com/diaspora/diaspora/pull/5084)
+* Port testsuite to RSpec 3 [#5170](https://github.com/diaspora/diaspora/pull/5170)
+* Port tag stream to Bootstrap [#5138](https://github.com/diaspora/diaspora/pull/5138)
+* Consolidate migrations, if you need a migration prior 2013, checkout the latest release in the 0.4.x series first [#5173](https://github.com/diaspora/diaspora/pull/5173)
+* Add tests for mobile sign up [#5185](https://github.com/diaspora/diaspora/pull/5185)
+* Display new conversation form on conversations/index [#5178](https://github.com/diaspora/diaspora/pull/5178)
+* Port profile page to Backbone [#5180](https://github.com/diaspora/diaspora/pull/5180)
+* Pull punycode.js from rails-assets.org [#5263](https://github.com/diaspora/diaspora/pull/5263)
+* Redesign profile page and port to Bootstrap [#4657](https://github.com/diaspora/diaspora/pull/4657)
+* Unify stream selection links in the left sidebar [#5271](https://github.com/diaspora/diaspora/pull/5271)
+
+## Bug fixes
+* orca cannot see 'Add Contact' button [#5158](https://github.com/diaspora/diaspora/pull/5158)
+* Move submit button to the right in conversations view [#4960](https://github.com/diaspora/diaspora/pull/4960)
+* Handle long URLs and titles in OpenGraph descriptions [#5208](https://github.com/diaspora/diaspora/pull/5208)
+* Fix deformed getting started popover [#5227](https://github.com/diaspora/diaspora/pull/5227)
+* Use correct locale for invitation subject [#5232](https://github.com/diaspora/diaspora/pull/5232)
+* Initial support for IDN emails
+* Fix services settings reported by statistics.json [#5256](https://github.com/diaspora/diaspora/pull/5256)
+
+## Features
+* Don't pull jQuery from a CDN by default [#5105](https://github.com/diaspora/diaspora/pull/5105)
+* Better character limit message [#5151](https://github.com/diaspora/diaspora/pull/5151)
+* Remember whether a AccountDeletion was performed [#5156](https://github.com/diaspora/diaspora/pull/5156)
+* Increased the number of notifications shown in drop down bar to 15 [#5129](https://github.com/diaspora/diaspora/pull/5129)
+* Increase possible captcha length [#5169](https://github.com/diaspora/diaspora/pull/5169)
+* Display visibility icon in publisher aspects dropdown [#4982](https://github.com/diaspora/diaspora/pull/4982)
+
 # 0.4.1.1
 
 * Fix XSS issue in poll questions [#5274](https://github.com/diaspora/diaspora/issues/5274)
@@ -126,7 +190,7 @@ Read more in [#4249](https://github.com/diaspora/diaspora/pull/4249) and [#4883]
 * Reorder and reword items on user settings page [#4912](https://github.com/diaspora/diaspora/pull/4912)
 * SPV: Improve padding and interaction counts [#4426](https://github.com/diaspora/diaspora/pull/4426)
 * Remove auto 'mark as read' for notifications [#4810](https://github.com/diaspora/diaspora/pull/4810)
-* Improve set read/unread in notifications dropdown [#4869](https://github.com/diaspora/diaspora/pull/4869) 
+* Improve set read/unread in notifications dropdown [#4869](https://github.com/diaspora/diaspora/pull/4869)
 * Refactor publisher: trigger events for certain actions, introduce 'disabled' state [#4932](https://github.com/diaspora/diaspora/pull/4932)
 
 ## Bug fixes

@@ -13,17 +13,18 @@
 @import 'opengraph'
 @import 'poll'
 @import 'help'
-@import 'profile'
 @import 'publisher_blueprint'
 @import 'facebox'
 @import 'aspects'
 @import 'stream-faces'
 @import 'popover'
-@import 'stream_element'
+@import 'stream_element_blueprint'
 @import 'report'
 @import 'new_styles/_forms'
 @import 'tag'
 @import 'photo'
+
+@import 'perfect-scrollbar'
 
 /* ====== media ====== */
 .media
@@ -767,12 +768,10 @@ ul#press_logos
     :color $text-grey
 
 .likes
-  .icons-heart
-    :height 12px
-    :width 13px
-    :display inline-block
+  .entypo.heart
+    :font-size 16px
+    :line-height 16px
     :vertical-align top
-    :margin-top 3px
     :margin-right 5px
 
   .bd

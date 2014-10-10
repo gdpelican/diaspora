@@ -3,9 +3,9 @@
 #   the COPYRIGHT file.
 
 class StatusMessagesController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
 
-  before_filter :remove_getting_started, :only => [:create]
+  before_action :remove_getting_started, :only => [:create]
 
   use_bootstrap_for :bookmarklet
 
@@ -95,7 +95,7 @@ class StatusMessagesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to :back }
         format.mobile { redirect_to stream_path }
-        format.json { render :nothing => true, :status => 403 }
+        format.json { render :text => @status_message.errors.messages[:text].to_sentence, :status => 403 }
       end
     end
   end

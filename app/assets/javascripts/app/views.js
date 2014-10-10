@@ -35,9 +35,10 @@ app.views.Base = Backbone.View.extend({
 
   renderTemplate : function(){
     var presenter = _.isFunction(this.presenter) ? this.presenter() : this.presenter
-    this.template = JST[this.templateName+"_tpl"]
+    this.template = HandlebarsTemplates[this.templateName+"_tpl"]
     if(!this.template) {
       console.log(this.templateName ? ("no template for " + this.templateName) : "no templateName specified")
+      return;
     }
 
     this.$el

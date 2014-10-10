@@ -49,8 +49,8 @@ Diaspora::Application.routes.draw do
   end
 
   # Streams
-  get "participate" => "streams#activity", :as => "activity_stream" # legacy
-  get "explore" => "streams#multi", :as => "stream"                 # legacy
+  get "participate" => "streams#activity" # legacy
+  get "explore" => "streams#multi"        # legacy
 
   get "activity" => "streams#activity", :as => "activity_stream"
   get "stream" => "streams#multi", :as => "stream"
@@ -84,7 +84,7 @@ Diaspora::Application.routes.draw do
       get :read_all
     end
   end
-  
+
 
   resources :tags, :only => [:index]
 
@@ -104,15 +104,15 @@ Diaspora::Application.routes.draw do
 
   controller :users do
     get 'public/:username'          => :public,           :as => 'users_public'
-    match 'getting_started'         => :getting_started,  :as => 'getting_started'
-    match 'privacy'                 => :privacy_settings, :as => 'privacy_settings'
+    get 'getting_started'           => :getting_started,  :as => 'getting_started'
+    get 'privacy'                   => :privacy_settings, :as => 'privacy_settings'
     get 'getting_started_completed' => :getting_started_completed
     get 'confirm_email/:token'      => :confirm_email,    :as => 'confirm_email'
   end
 
   # This is a hack to overide a route created by devise.
   # I couldn't find anything in devise to skip that route, see Bug #961
-  match 'users/edit' => redirect('/user/edit')
+  get 'users/edit' => redirect('/user/edit')
 
   devise_for :users, :controllers => {:registrations => "registrations",
                                       :passwords     => "passwords",
@@ -122,14 +122,14 @@ Diaspora::Application.routes.draw do
   get 'users/invitation/accept' => 'invitations#edit'
   get 'invitations/email' => 'invitations#email', :as => 'invite_email'
   get 'users/invitations' => 'invitations#new', :as => 'new_user_invitation'
-  post 'users/invitations' => 'invitations#create', :as => 'new_user_invitation'
+  post 'users/invitations' => 'invitations#create', :as => 'user_invitation'
 
   get 'login' => redirect('/users/sign_in')
 
   # Admin backend routes
 
   scope 'admins', :controller => :admins do
-    match :user_search
+    match :user_search, via: [:get, :post]
     get   :admin_inviter
     get   :weekly_user_stats
     get   :correlations
@@ -146,7 +146,6 @@ Diaspora::Application.routes.draw do
 
 
   resources :contacts,           :except => [:update, :create] do
-    get :sharing, :on => :collection
   end
   resources :aspect_memberships, :only  => [:destroy, :create]
   resources :share_visibilities,  :only => [:update]
@@ -160,6 +159,7 @@ Diaspora::Application.routes.draw do
     resources :photos
     get :contacts
     get "aspect_membership_button" => :aspect_membership_dropdown, :as => "aspect_membership_button"
+    get :stream
     get :hovercard
 
     member do
@@ -193,8 +193,8 @@ Diaspora::Application.routes.draw do
   resources :services, :only => [:index, :destroy]
   controller :services do
     scope "/auth", :as => "auth" do
-      match ':provider/callback' => :create
-      match :failure
+      get ':provider/callback' => :create
+      get :failure
     end
   end
 
@@ -214,7 +214,7 @@ Diaspora::Application.routes.draw do
 
   get 'mobile/toggle', :to => 'home#toggle_mobile', :as => 'toggle_mobile'
 
-  # help
+  # Help
   get 'help' => 'help#faq', :as => 'help'
 
   #Protocol Url
@@ -222,7 +222,7 @@ Diaspora::Application.routes.draw do
 
   #Statistics
   get :statistics, controller: :statistics
-  
+
   # Terms
   if AppConfig.settings.terms.enable?
     get 'terms' => 'terms#index'
