@@ -9,52 +9,30 @@ class NotificationsController < ApplicationController
   use_bootstrap_for :index
 
   def update
-    note = Notification.where(:recipient_id => current_user.id, :id => params[:id]).first
-    if note
-      note.set_read_state(params[:set_unread] != "true" )
+    if note = current_user.notifications.find_by_id(params[:id])
+      note.set_read_state(params[:set_unread] != "true")
+      response = { guid: note.id, unread: note.unread }
+    end
 
-      respond_to do |format|
-        format.json { render :json => { :guid => note.id, :unread => note.unread } }
-      end
-
-    else
-      respond_to do |format|
-        format.json { render :json => {}.to_json }
-      end
+    respond_to do |format|
+      format.json { render json: response || {} }
     end
   end
 
   def index
-    conditions = {:recipient_id => current_user.id}
-    if params[:type] && Notification.types.has_key?(params[:type])
-      conditions[:type] = Notification.types[params[:type]]
-    end
-    if params[:show] == "unread" then conditions[:unread] = true end
-    page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @notifications = WillPaginate::Collection.create(page, per_page, Notification.where(conditions).count ) do |pager|
-      result = Notification.find(:all,
-                                 :conditions => conditions,
-                                 :order => 'created_at desc',
-                                 :include => [:target, {:actors => :profile}],
-                                 :limit => pager.per_page,
-                                 :offset => pager.offset
-                                )
+    @notifications = paginated_collection current_user.notifications
+                                                      .includes(:target, actors: :profile)
+                                                      .by_type(params[:type])
+                                                      .unread_only(params[:show] == 'unread')
+                                                      .order(:created_at)
+    
+    @unread_notification_count          = current_user.unread_notifications.count
+    @grouped_unread_notification_counts = Notification.group_by_type(current_user.unread_notifications)
+    @group_days                         = @notifications.group_by(&:day_created)
 
-      pager.replace(result)
-    end
     @notifications.each do |n|
-      n.note_html = render_to_string( :partial => 'notify_popup_item', :locals => { :n => n } )
+      n.note_html = render_to_string( :partial => 'notify_popup_item', :locals => { :n => n } ) # ew!
     end
-    @group_days = @notifications.group_by{|note| I18n.l(note.created_at, :format => I18n.t('date.formats.fullmonth_day')) }
-
-    @unread_notification_count = current_user.unread_notifications.count
-
-    @grouped_unread_notification_counts = {}
-
-    Notification.types.each_with_object(current_user.unread_notifications.group_by(&:type)) {|(name, type), notifications|
-      @grouped_unread_notification_counts[name] = notifications.has_key?(type) ? notifications[type].count : 0
-    }
 
     respond_to do |format|
       format.html
@@ -65,22 +43,27 @@ class NotificationsController < ApplicationController
   end
 
   def read_all
-    current_type = Notification.types[params[:type]]
-    notifications = Notification.where(:recipient_id => current_user.id)
-    notifications = notifications.where(:type => current_type) if params[:type]
-    notifications.update_all(:unread => false)
+    current_user.unread_notifications.by_type(params[:type]).update_all(unread: false)
+    
     respond_to do |format|
-      if current_user.unread_notifications.count > 0
-        format.html { redirect_to notifications_path }
-        format.mobile { redirect_to notifications_path }
-      else
-        format.html { redirect_to stream_path }
-        format.mobile { redirect_to stream_path }
-      end
+      format.html { redirect_to path_after_read_all }
+      format.mobile { redirect_to path_after_read_all }
       format.xml { render :xml => {}.to_xml }
       format.json { render :json => {}.to_json }
     end
 
+  end
+
+  private
+
+  def paginated_collection(collection)
+    WillPaginate::Collection.create params[:page] || 1, params[:per_page] || 25, collection.size do |pager|
+      pager.replace collection.limit(pager.per_page).offset(pager.offset)
+    end
+  end
+
+  def path_after_read_all
+    current_user.unread_notifications.count > 0 ? notifications_path : stream_path
   end
 
 end

@@ -12,20 +12,20 @@ describe NotificationsController do
   describe '#update' do
     it 'marks a notification as read if it gets no other information' do
       note = mock_model( Notification )
-      Notification.should_receive( :where ).and_return( [note] )
+      expect(Notification).to receive( :find_by_id ).and_return( note )
       note.should_receive( :set_read_state ).with( true )
       get :update, "id" => note.id
     end
     it 'marks a notification as read if it is told to' do
       note = mock_model( Notification )
-      Notification.should_receive( :where ).and_return( [note] )
+      expect(Notification).to receive( :find_by_id ).and_return( note )
       note.should_receive( :set_read_state ).with( true )
       get :update, "id" => note.id, :set_unread => "false"
     end
 
     it 'marks a notification as unread if it is told to' do
       note = mock_model( Notification )
-      Notification.should_receive( :where ).and_return( [note] )
+      expect(Notification).to receive( :find_by_id ).and_return( note )
       note.should_receive( :set_read_state ).with( false )
       get :update, "id" => note.id, :set_unread => "true"
     end

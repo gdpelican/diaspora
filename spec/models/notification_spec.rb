@@ -52,6 +52,65 @@ describe Notification do
 
   end
 
+  describe '.unread_only' do
+    before do
+      @read   = FactoryGirl.create :notification, unread: false
+      @unread = FactoryGirl.create :notification, unread: true
+    end
+
+    it "returns all unread notifications when passed true" do
+      result = Notification.unread_only(true)
+      expect(result.pluck(:id)).to include @unread.id
+      expect(result.pluck(:id)).to_not include @read.id
+    end
+
+    it 'returns all notifications when passed false' do
+      result = Notification.unread_only(false)
+      expect(result.pluck(:id)).to include @unread.id
+      expect(result.pluck(:id)).to include @read.id
+    end
+  end
+ 
+  describe '.by_type' do
+    before do
+      @also_commented  = FactoryGirl.create :notification, type: 'Notifications::AlsoCommented'
+      @comment_on_post = FactoryGirl.create :notification, type: 'Notifications::CommentOnPost'
+    end
+
+    it 'filters by type when type is present' do
+      ids = Notification.by_type('also_commented').pluck(:id)
+      expect(ids).to include @also_commented.id
+      expect(ids).to_not include @comment_on_post.id
+    end
+
+    it 'returns all when type is blank' do
+      ids = Notification.by_type.pluck(:id)
+      expect(ids).to include @also_commented.id
+      expect(ids).to include @comment_on_post.id
+    end
+  end
+
+  describe '.group_by_type' do
+
+    before do
+      2.times { FactoryGirl.create :notification, type: 'Notifications::AlsoCommented' }
+      @collection = Notification.where(nil)
+    end
+
+    it "should group a collection of notifications by type" do
+      grouped = Notification.group_by_type @collection
+      expect(grouped['also_commented']).to eq 2
+    end
+
+    it "maps 0 to a type with no notifications" do
+      grouped = Notification.group_by_type @collection
+      expect(grouped['comment_on_post']).to eq 0
+    end
+
+    it "should map all key types" do
+      expect(Notification.group_by_type(@collection).keys).to eq Notification.types.keys
+    end
+  end
 
   describe '.concatenate_or_create' do
     it 'creates a new notificiation if the notification does not exist, or if it is unread' do

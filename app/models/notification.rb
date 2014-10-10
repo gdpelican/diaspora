@@ -14,6 +14,14 @@ class Notification < ActiveRecord::Base
     self.where(opts.merge!(:recipient_id => recipient.id)).order('updated_at desc')
   end
 
+  def self.by_type(type = nil)
+    type.present? ? where(type: types[type]) : where(nil)
+  end
+
+  def self.unread_only(unread = true)
+    unread.present? ? where(unread: true) : where(nil)
+  end
+
   def self.notify(recipient, target, actor)
     return nil unless target.respond_to? :notification_type
 
@@ -50,6 +58,10 @@ class Notification < ActiveRecord::Base
 
   def effective_target
     self.popup_translation_key == "notifications.mentioned" ? self.target.post : self.target
+  end
+
+  def day_created
+    I18n.l(created_at, format: I18n.t('date.formats.fullmonth_day'))
   end
 
 private
@@ -98,5 +110,9 @@ private
       "reshared" => "Notifications::Reshared",
       "started_sharing" => "Notifications::StartedSharing"
     }
+  end
+
+  def self.group_by_type(collection)
+    types.map { |key, type| { key => collection.where(type: type).count } }.reduce(:merge)
   end
 end
